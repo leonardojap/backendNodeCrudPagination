@@ -1,8 +1,10 @@
 //Dependencies
-import * as LocalStorage from 'node-localstorage';
+import * as jwt from 'jsonwebtoken';
+import app from "./../app";
 
 import ResponseDto from './../DTO/response';
 import User from './../DTO/user'
+import db from '../../config/database';
 
 
 class UserController{
@@ -10,55 +12,54 @@ class UserController{
     constructor(){}
 
     create(req, res){
-        let data:User = req.body; //get data from client in body
-        //simulate database instance
-        let localStorage = new LocalStorage.LocalStorage('./scratch');    
-        let previous = localStorage.getItem(data.email);
-        if(previous != undefined){ // check if the user does exist
-            res.send(new ResponseDto(200,"That email address is registered yet",{}));
-        }else{
-            localStorage.setItem(data.email, JSON.stringify(data)); // register in 'data base'
-            res.send(new ResponseDto(200,"The user was created successfullt",data));
-        }
+        let data:User = req.body;
+        
+
+        let sql = "select * from users where email = ?";
+        db.get(sql, data.email, (err, user) => {
+            if (err) {
+                res.send(new ResponseDto(200, "Ha ocurrido un error, intenete mas tarde", {}, false));
+            }
+            if(user){
+                res.send(new ResponseDto(200, "Usuario ya registraso", {}, false));
+            }else{
+                const SQL = 'INSERT INTO users (name, lastName, email, password) VALUES (?,?,?,?)';
+                const params = [data.name, data.lastName, data.email, data.password];
+                db.run(SQL, params, function (err) {
+                    if (err){
+                        res.send(new ResponseDto(200, "Ha ocurrido un error, intenete mas tarde", {}, false));
+                        return;
+                    }
+                    data.id = this.lastID;
+                    res.send(new ResponseDto(200, "Usuario registrado con exito", data, true));
+                })
+            }
+        });
     }
 
-    update(req, res){
-        let data = req.body;
-        //simulate database instance
-        let localStorage = new LocalStorage.LocalStorage('./scratch');
-        let previous = localStorage.getItem(data.email);
-        if(previous == undefined){
-            res.send(new ResponseDto(200,"There is not an user registered with that email address",{}));
-        }else{
-            let user: User = JSON.parse(previous);
-            user = Object.assign(user, data);
-            localStorage.setItem(user.email, JSON.stringify(user));
-            res.send(new ResponseDto(200, "The user was updated successfully", user));
-        }
-    }
-
-    findByEmail(req, res){
-        //simulate database instance
-        let localStorage = new LocalStorage.LocalStorage('./scratch');
-        let user = localStorage.getItem(req.params.id);
-        if(user == undefined){
-            res.send(new ResponseDto(200,"There is not an user registered with that email address",{}));
-        }else{
-            let data: User = JSON.parse(user);
-            res.send(new ResponseDto(200, "The user was finded successfully", data));
-        }
-    }
-
-    delete(req, res){
-        //simulate database instance
-        let localStorage = new LocalStorage.LocalStorage('./scratch');
-        let user = localStorage.getItem(req.params.id);
-        if(user == undefined){
-            res.send(new ResponseDto(200,"There is not an user registered with that email address",{}));
-        }else{
-            localStorage.removeItem(req.params.id);
-            res.send(new ResponseDto(200, "The user was deleted successfully", {}));
-        }
+    login(req, res){
+        let sql = "select * from users where email = ?";
+        db.get(sql, req.body.email, (err, user) => {
+            if (err) {
+                res.send(new ResponseDto(200, "Ha ocurrido un error, intenete mas tarde", {}, false));
+                return;
+            }
+            if(user){
+                if(user.email == req.body.email && user.password == req.body.password){
+                    const datatoken = {
+                        check:  true
+                    };
+                    const token = jwt.sign(datatoken, app.get('llave'), {
+                        expiresIn: 7800
+                    });
+                    res.send(new ResponseDto(200, "Login exitoso", {token: token}, true));
+                }else{
+                    res.send(new ResponseDto(200, "Credenciales invalidas", {}, false));
+                }
+            }else{
+                res.send(new ResponseDto(200, "Usuario no existe", {}, false));
+            }
+        });
     }
 
 }

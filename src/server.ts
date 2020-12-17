@@ -1,16 +1,27 @@
 //import global app express instance
 import app from "./app";
-
-//router aplication, define all routes in our app, and redirect to respective controller
 import router from './routes/router';
+import config from './../config/configs';
+import * as figlet from 'figlet';
 
-//port to run in server
+
+figlet('LeoBackend...', function(err, data) {
+    if (err) {
+        console.dir(err);
+        return;
+    }
+    console.log(data)
+});
+
 const PORT = 3000;
 
-//base url and call router to map
+//seteamos la key como variable global para manejo de tokens
+app.set("llave", config.llave);
+
+//iniciamos los endpoints
 app.use("/api", router)
 
-// start server
+//Iniciamos el server
 app.listen(PORT, () => {
-    console.log(`API REST running in port ${PORT}`);
+    console.log(`API REST corriendo en el puerto ${PORT}`);
 })

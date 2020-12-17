@@ -1,7 +1,6 @@
 import * as express from "express";
 import * as bodyparser from 'body-parser';
- 
-class App {
+ class App {
     public app: express.Application;
     constructor() {
         this.app = express();

@@ -10,11 +10,11 @@ You can test it creating an user, updatind, find it and delete it.
 
 1 First, clone this porject:
 
-	 git clone https://github.com/leonardojap/backendNodeTypeScriptScrudUser.git
+	 git clone https://github.com/leonardojap/backendNodeCrudPagination.git
  
 2 Go to the folder projec
 
-	cd backendNodeTypeScriptScrudUser
+	cd backendNodeCrudPagination
 
 3 install dependencies
 
@@ -37,38 +37,32 @@ Create user:
 		"lastName": "Alvarado",
 		"email":"ing.leonardo92@gmail.com",
 		"password":"12345678"
-	}
+	}	
 
-Update user:
+Login user:
 
-	Url: localhost:3000/api/user/update
+	Url: localhost:3000/api/login
+
 	Metoth: POST
 	Data:
+
 	{
-		"name":"Leonardo Jose",
-		"lastName": "Alvarado Padua",
 		"email":"ing.leonardo92@gmail.com",
-		"password":"newpass"
+		"password":"12345678"
 	}
-	
 
-Find user:
-
-	Url: localhost:3000/api/user/:emailUser
-
+Pgainate photos:
+	Url: localhost:3000/api/photos/numPage
 	Metoth: GET
-
-Delete user:
-
-	Url: localhost:3000/api/user/:emailUser
-	Metoth: DELETE
+	
 
 Responses:
 
 	{
 		code:200,
 		message:"...",
-		data{...} //an object or empty
+		data{...}
+		success: true
 	}
 
 

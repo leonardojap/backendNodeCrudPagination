@@ -13,7 +13,7 @@ figlet('LeoBackend...', function(err, data) {
     console.log(data)
 });
 
-const PORT = 3000;
+const PORT = 8000;
 
 //seteamos la key como variable global para manejo de tokens
 app.set("llave", config.llave);

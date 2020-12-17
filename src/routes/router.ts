@@ -16,6 +16,7 @@ import ResponseDto from '../DTO/response';
 class Router{
     public router = express.Router();
     public midleware = express.Router();
+    
     constructor(){
 
         //midleware para validar token

@@ -52,7 +52,8 @@ class UserController{
                     const token = jwt.sign(datatoken, app.get('llave'), {
                         expiresIn: 7800
                     });
-                    res.send(new ResponseDto(200, "Login exitoso", {token: token}, true));
+                    user.password = "";
+                    res.send(new ResponseDto(200, "Login exitoso", {token: token, user: user}, true));
                 }else{
                     res.send(new ResponseDto(200, "Credenciales invalidas", {}, false));
                 }
